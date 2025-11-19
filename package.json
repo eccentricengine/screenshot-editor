@@ -1,0 +1,64 @@
+{
+  "name": "screenshot-editor",
+  "version": "1.0.0",
+  "description": "A powerful web component for taking screenshots and annotating images with drawing tools",
+  "main": "./dist/index.cjs.js",
+  "module": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "collection": "./dist/collection/collection-manifest.json",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs.js",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./loader": "./loader/index.js",
+    "./standalone": "./screenshot-editor.standalone.js"
+  },
+  "files": [
+    "dist/",
+    "loader/",
+    "screenshot-editor.standalone.js",
+    "README.md",
+    "INTEGRATION.md",
+    "NPM_USAGE.md"
+  ],
+  "scripts": {
+    "build": "stencil build",
+    "build:bundle": "node build-bundle.js",
+    "start": "stencil build --dev --watch --serve",
+    "test": "stencil test --spec --e2e",
+    "test.watch": "stencil test --spec --e2e --watch",
+    "generate": "stencil generate"
+  },
+  "keywords": [
+    "screenshot",
+    "annotation",
+    "image-editor",
+    "web-component",
+    "stencil",
+    "canvas",
+    "drawing",
+    "html2canvas",
+    "image-annotation"
+  ],
+  "author": "Ankit Prajapati",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/screenshot-editor.git"
+  },
+  "homepage": "https://github.com/yourusername/screenshot-editor#readme",
+  "bugs": {
+    "url": "https://github.com/yourusername/screenshot-editor/issues"
+  },
+  "dependencies": {
+    "@stencil/core": "^4.0.0",
+    "html2canvas": "^1.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}
+

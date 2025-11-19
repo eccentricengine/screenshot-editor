@@ -1,0 +1,21 @@
+# Compiled output
+/dist
+/www
+/loader
+
+# Dependencies
+/node_modules
+
+# Logs
+*.log
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+

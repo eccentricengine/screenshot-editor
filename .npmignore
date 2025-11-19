@@ -1,0 +1,15 @@
+node_modules/
+src/
+www/
+*.log
+.DS_Store
+.git/
+.gitignore
+tsconfig.json
+stencil.config.ts
+build-*.js
+*.bundle.js
+example-*.html
+simple-*.html
+index.html
+
