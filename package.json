@@ -19,9 +19,7 @@
     "dist/",
     "loader/",
     "screenshot-editor.standalone.js",
-    "README.md",
-    "INTEGRATION.md",
-    "NPM_USAGE.md"
+    "README.md"
   ],
   "scripts": {
     "build": "stencil build",
@@ -46,11 +44,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/screenshot-editor.git"
+    "url": "https://github.com/eccentricengine/screenshot-editor"
   },
-  "homepage": "https://github.com/yourusername/screenshot-editor#readme",
+  "homepage": "https://github.com/eccentricengine/screenshot-editor#readme",
   "bugs": {
-    "url": "https://github.com/yourusername/screenshot-editor/issues"
+    "url": "https://github.com/eccentricengine/screenshot-editor/issues"
   },
   "dependencies": {
     "@stencil/core": "^4.0.0",

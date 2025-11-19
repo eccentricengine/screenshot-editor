@@ -7,9 +7,5 @@ www/
 .gitignore
 tsconfig.json
 stencil.config.ts
-build-*.js
-*.bundle.js
-example-*.html
-simple-*.html
-index.html
+package-lock.json
 
