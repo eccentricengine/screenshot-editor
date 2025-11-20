@@ -139,70 +139,6 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>📸 Screenshot Editor</h1>
-    <p class="subtitle">A powerful Stencil.js Web Component for taking screenshots and annotating images</p>
-
-    <div class="demo-content">
-      <div class="demo-section">
-        <h2>🚀 Quick Start</h2>
-        <p>The screenshot editor component is already embedded on this page. Look for the floating button in the bottom-right corner!</p>
-        <p>Click the button to start selecting a region to screenshot, then annotate it with various tools.</p>
-      </div>
-
-      <div class="demo-section">
-        <h2>💻 Programmatic Usage</h2>
-        <p>You can also trigger the screenshot programmatically:</p>
-        <div class="button-group">
-          <button id="triggerBtn">Trigger Screenshot</button>
-          <button id="openEditorBtn">Open Editor with Image</button>
-        </div>
-        <div class="code-block">
-const editor = document.querySelector('screenshot-editor');
-// Start screenshot selection
-await editor.startScreenshot();
-
-// Or open editor with existing image
-await editor.openEditor(imageBlob);
-        </div>
-      </div>
-
-      <div class="demo-section">
-        <h2>📡 Event Handling</h2>
-        <p>Listen to component events:</p>
-        <div class="code-block">
-editor.addEventListener('screenshot-selected', (e) => {
-  console.log('Screenshot captured:', e.detail);
-});
-
-editor.addEventListener('editor-opened', () => {
-  console.log('Editor opened');
-});
-
-editor.addEventListener('editor-output', (e) => {
-  const { blob, base64 } = e.detail;
-  console.log('Image exported:', blob, base64);
-  // Use the image as needed
-});
-
-editor.addEventListener('editor-closed', () => {
-  console.log('Editor closed');
-});
-        </div>
-      </div>
-
-      <div class="info-box">
-        <strong>💡 Tip:</strong>
-        Press ESC during selection to cancel. The editor supports touch devices and includes undo/redo functionality.
-      </div>
-
-      <div class="output-area" id="outputArea">
-        <h3>Event Output:</h3>
-        <p id="outputText">Events will appear here...</p>
-        <div id="outputImage"></div>
-      </div>
-    </div>
-  </div>
 
   <!-- Include the component -->
   <script type="module">
@@ -223,76 +159,12 @@ editor.addEventListener('editor-closed', () => {
     show-button="true"
   ></screenshot-editor>
 
-  <script>
+  <script type="module">
     const editor = document.querySelector('screenshot-editor');
-    const outputArea = document.getElementById('outputArea');
-    const outputText = document.getElementById('outputText');
-    const outputImage = document.getElementById('outputImage');
-
-    // Event listeners
-    editor.addEventListener('screenshot-selected', (e) => {
-      outputText.textContent = 'Screenshot captured! Opening editor...';
-      console.log('Screenshot captured:', e.detail);
-    });
-
-    editor.addEventListener('editor-opened', () => {
-      outputText.textContent = 'Editor opened. You can now annotate the image.';
-      console.log('Editor opened');
-    });
-
+    
     editor.addEventListener('editor-output', (e) => {
       const { blob, base64 } = e.detail;
-      outputText.textContent = 'Image exported successfully!';
-      
-      // Display the image
-      const img = document.createElement('img');
-      img.src = base64;
-      img.style.maxWidth = '100%';
-      img.style.marginTop = '10px';
-      img.style.border = '1px solid #ddd';
-      img.style.borderRadius = '4px';
-      outputImage.innerHTML = '';
-      outputImage.appendChild(img);
-      
-      console.log('Image exported:', blob, base64);
-    });
-
-    editor.addEventListener('editor-closed', () => {
-      outputText.textContent = 'Editor closed.';
-      console.log('Editor closed');
-    });
-
-    // Button handlers
-    document.getElementById('triggerBtn').addEventListener('click', async () => {
-      try {
-        await editor.startScreenshot();
-      } catch (error) {
-        console.error('Error starting screenshot:', error);
-      }
-    });
-
-    document.getElementById('openEditorBtn').addEventListener('click', async () => {
-      // Create a sample image
-      const canvas = document.createElement('canvas');
-      canvas.width = 400;
-      canvas.height = 300;
-      const ctx = canvas.getContext('2d');
-      
-      // Draw a sample image
-      ctx.fillStyle = '#667eea';
-      ctx.fillRect(0, 0, 400, 300);
-      ctx.fillStyle = 'white';
-      ctx.font = '24px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('Sample Image', 200, 150);
-      
-      canvas.toBlob(async (blob) => {
-        try {
-          await editor.openEditor(blob);
-        } catch (error) {
-          console.error('Error opening editor:', error);
-        }
-      });
+      console.log('Exported image:', blob, base64);
     });
   </script>
 </body>
