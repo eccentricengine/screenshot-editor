@@ -1,14 +1,22 @@
 # 📸 Screenshot Editor
 
-A powerful web component for taking screenshots and annotating images with drawing tools. Works with any framework or vanilla JavaScript.
+A powerful Stencil.js Web Component that allows users to take screenshots of any DOM portion and annotate them with a comprehensive image editor similar to Windows Paint.
 
 ## ✨ Features
 
-- 🎯 **DOM Selection**: Select any portion of the page to screenshot
-- 🖌️ **Drawing Tools**: Freehand, Rectangle, Ellipse, Arrow, Line, Text, Crop
-- 🎨 **Editor**: Color picker, brush size, undo/redo, export to Blob/base64
-- 📱 **Responsive**: Works on desktop and mobile devices
-- 🎪 **Framework Agnostic**: Works with React, Vue, Angular, or plain JavaScript
+- 🎯 **DOM Selection**: Semi-transparent overlay for selecting any portion of the page
+- 🖌️ **Drawing Tools**:
+  - Freehand drawing
+  - Rectangle, Ellipse, Arrow, Line
+  - Text tool with font size control
+  - Crop tool
+- 🎨 **Editor Features**:
+  - Color picker
+  - Brush size control
+  - Undo/Redo functionality
+  - Export to Blob/base64
+- 📱 **Responsive & Touch-Friendly**: Works on desktop and mobile devices
+- 🎪 **Flexible Integration**: Floating or inline button, or programmatic control
 
 ## 📦 Installation
 
@@ -16,19 +24,27 @@ A powerful web component for taking screenshots and annotating images with drawi
 npm install screenshot-editor
 ```
 
-## 🚀 Usage
+## 🚀 Quick Start
 
-### Plain JavaScript / HTML
-
-**Method 1: Standalone Script (Easiest)**
+### Vanilla JavaScript - Method 1: Script Tag (CDN/Unpkg)
 
 ```html
 <!DOCTYPE html>
 <html>
 <head>
-  <script src="./node_modules/screenshot-editor/screenshot-editor.standalone.js"></script>
+  <title>Screenshot Editor Demo</title>
 </head>
 <body>
+  <h1>My Page</h1>
+  <p>Click the button to take a screenshot!</p>
+  
+  <!-- Method 1: Using script tag with loader -->
+  <script type="module">
+    import { defineCustomElements } from 'https://unpkg.com/screenshot-editor@latest/loader/index.js';
+    defineCustomElements();
+  </script>
+  
+  <!-- Use the component -->
   <screenshot-editor
     button-label="Take Screenshot"
     button-position="bottom-right"
@@ -36,13 +52,133 @@ npm install screenshot-editor
   ></screenshot-editor>
 
   <script>
-    window.addEventListener('screenshot-editor-ready', () => {
-      const editor = window.getScreenshotEditor();
+    const editor = document.querySelector('screenshot-editor');
+    
+    editor.addEventListener('editor-output', (e) => {
+      const { blob, base64 } = e.detail;
+      console.log('Exported image:', blob, base64);
+      // Use the image as needed
+    });
+  </script>
+</body>
+</html>
+```
+
+### Vanilla JavaScript - Method 2: ES Modules (Local)
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Screenshot Editor Demo</title>
+</head>
+<body>
+  <h1>My Page</h1>
+  <p>Click the button to take a screenshot!</p>
+  
+  <!-- Method 2: Using ES modules from node_modules -->
+  <script type="module">
+    import { defineCustomElements } from './node_modules/screenshot-editor/loader/index.js';
+    defineCustomElements();
+  </script>
+  
+  <screenshot-editor
+    button-label="Take Screenshot"
+    button-position="bottom-right"
+  ></screenshot-editor>
+
+  <script type="module">
+    const editor = document.querySelector('screenshot-editor');
+    
+    editor.addEventListener('editor-output', (e) => {
+      const { blob, base64 } = e.detail;
+      console.log('Exported image:', blob, base64);
+    });
+  </script>
+</body>
+</html>
+```
+
+### Vanilla JavaScript - Method 3: CommonJS (Node.js/Bundlers)
+
+```javascript
+// In your JavaScript file
+const { defineCustomElements } = require('screenshot-editor/loader');
+
+// Initialize the component
+defineCustomElements();
+
+// Use the component
+const editor = document.querySelector('screenshot-editor');
+
+editor.addEventListener('editor-output', (e) => {
+  const { blob, base64 } = e.detail;
+  console.log('Exported image:', blob, base64);
+});
+```
+
+### Vanilla JavaScript - Method 4: Function-Based Triggering (No Button)
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Screenshot Editor - Function Based</title>
+</head>
+<body>
+  <h1>My Page</h1>
+  <p>Click the button below to trigger screenshot!</p>
+  
+  <!-- Your custom button -->
+  <button id="customScreenshotBtn">Take Screenshot</button>
+  
+  <!-- Component without button -->
+  <screenshot-editor show-button="false"></screenshot-editor>
+
+  <script type="module">
+    import { defineCustomElements } from './node_modules/screenshot-editor/loader/index.js';
+    defineCustomElements().then(() => {
+      const editor = document.querySelector('screenshot-editor');
+      
+      // Function to trigger screenshot
+      async function takeScreenshot() {
+        try {
+          await editor.startScreenshot();
+        } catch (error) {
+          console.error('Screenshot failed:', error);
+        }
+      }
+      
+      // Attach to your custom button
+      document.getElementById('customScreenshotBtn').addEventListener('click', takeScreenshot);
+      
+      // Or call it programmatically
+      // takeScreenshot();
+      
+      // Handle events
+      editor.addEventListener('screenshot-selected', (e) => {
+        console.log('Screenshot captured:', e.detail);
+      });
+      
+      editor.addEventListener('editor-opened', () => {
+        console.log('Editor opened');
+      });
       
       editor.addEventListener('editor-output', (e) => {
         const { blob, base64 } = e.detail;
-        console.log('Exported:', blob);
-        // Use the image
+        console.log('Exported image:', blob, base64);
+        
+        // Example: Download the image
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `screenshot-${Date.now()}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+      
+      editor.addEventListener('editor-closed', () => {
+        console.log('Editor closed');
       });
     });
   </script>
@@ -50,38 +186,55 @@ npm install screenshot-editor
 </html>
 ```
 
-**Method 2: ES Modules**
+### Vanilla JavaScript - Method 5: Open Editor with Existing Image
 
 ```html
-<script type="module">
-  import { defineCustomElements } from './node_modules/screenshot-editor/loader/index.js';
-  await defineCustomElements();
-  
-  const editor = document.querySelector('screenshot-editor');
-  editor.addEventListener('editor-output', (e) => {
-    console.log('Exported:', e.detail);
-  });
-</script>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Screenshot Editor - Open with Image</title>
+</head>
+<body>
+  <h1>My Page</h1>
+  <input type="file" id="imageInput" accept="image/*">
+  <screenshot-editor show-button="false"></screenshot-editor>
+
+  <script type="module">
+    import { defineCustomElements } from './node_modules/screenshot-editor/loader/index.js';
+    defineCustomElements().then(() => {
+      const editor = document.querySelector('screenshot-editor');
+      const fileInput = document.getElementById('imageInput');
+      
+      fileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          try {
+            await editor.openEditor(file);
+          } catch (error) {
+            console.error('Failed to open editor:', error);
+          }
+        }
+      });
+      
+      editor.addEventListener('editor-output', (e) => {
+        const { blob, base64 } = e.detail;
+        console.log('Exported image:', blob, base64);
+      });
+    });
+  </script>
+</body>
+</html>
 ```
 
-**Global Functions (after standalone script loads):**
+## ⚛️ React Integration
 
-```javascript
-// Start screenshot
-window.startScreenshot();
+### Installation
 
-// Open editor with image
-window.openScreenshotEditor(imageBlob);
-
-// Get editor instance
-const editor = window.getScreenshotEditor();
+```bash
+npm install screenshot-editor
 ```
 
----
-
-### React
-
-**Method 1: Using useEffect Hook**
+### Usage
 
 ```jsx
 import React, { useEffect, useRef } from 'react';
@@ -91,33 +244,38 @@ function App() {
   const editorRef = useRef(null);
 
   useEffect(() => {
+    // Initialize the component
     defineCustomElements();
   }, []);
 
-  useEffect(() => {
-    const editor = editorRef.current;
-    if (!editor) return;
+  const handleScreenshot = async () => {
+    if (editorRef.current) {
+      await editorRef.current.startScreenshot();
+    }
+  };
 
-    const handleExport = (e) => {
-      const { blob, base64 } = e.detail;
-      console.log('Exported:', blob);
-      // Send to API or use as needed
-    };
-
-    editor.addEventListener('editor-output', handleExport);
-
-    return () => {
-      editor.removeEventListener('editor-output', handleExport);
-    };
-  }, []);
+  const handleEditorOutput = (e) => {
+    const { blob, base64 } = e.detail;
+    console.log('Exported image:', blob, base64);
+    
+    // Example: Upload to server
+    const formData = new FormData();
+    formData.append('image', blob, 'screenshot.png');
+    fetch('/api/upload', {
+      method: 'POST',
+      body: formData
+    });
+  };
 
   return (
     <div>
+      <h1>My React App</h1>
+      <button onClick={handleScreenshot}>Take Screenshot</button>
+      
       <screenshot-editor
         ref={editorRef}
-        button-label="Take Screenshot"
-        button-position="bottom-right"
-        show-button={true}
+        show-button="false"
+        onEditorOutput={handleEditorOutput}
       />
     </div>
   );
@@ -126,69 +284,16 @@ function App() {
 export default App;
 ```
 
-**Method 2: Custom Hook**
-
-```jsx
-import { useEffect, useRef, useCallback } from 'react';
-import { defineCustomElements } from 'screenshot-editor/loader';
-
-function useScreenshotEditor(onExport) {
-  const editorRef = useRef(null);
-
-  useEffect(() => {
-    defineCustomElements();
-  }, []);
-
-  useEffect(() => {
-    const editor = editorRef.current;
-    if (!editor) return;
-
-    const handleExport = (e) => onExport?.(e.detail);
-    editor.addEventListener('editor-output', handleExport);
-
-    return () => {
-      editor.removeEventListener('editor-output', handleExport);
-    };
-  }, [onExport]);
-
-  const startScreenshot = useCallback(async () => {
-    if (editorRef.current) {
-      await editorRef.current.startScreenshot();
-    }
-  }, []);
-
-  return { editorRef, startScreenshot };
-}
-
-// Usage
-function MyComponent() {
-  const handleExport = ({ blob, base64 }) => {
-    console.log('Exported:', blob);
-  };
-
-  const { editorRef, startScreenshot } = useScreenshotEditor(handleExport);
-
-  return (
-    <div>
-      <button onClick={startScreenshot}>Take Screenshot</button>
-      <screenshot-editor ref={editorRef} show-button={false} />
-    </div>
-  );
-}
-```
-
-**TypeScript Support:**
+### React with TypeScript
 
 ```tsx
 import React, { useEffect, useRef } from 'react';
 import { defineCustomElements } from 'screenshot-editor/loader';
 
+// Type definition for the component
 interface ScreenshotEditorElement extends HTMLElement {
   startScreenshot(): Promise<void>;
   openEditor(image: string | Blob): Promise<void>;
-  buttonLabel: string;
-  buttonPosition: string;
-  showButton: boolean;
 }
 
 function App() {
@@ -198,159 +303,177 @@ function App() {
     defineCustomElements();
   }, []);
 
+  const handleScreenshot = async () => {
+    if (editorRef.current) {
+      await editorRef.current.startScreenshot();
+    }
+  };
+
+  const handleEditorOutput = (e: CustomEvent<{ blob: Blob; base64: string }>) => {
+    const { blob, base64 } = e.detail;
+    console.log('Exported image:', blob, base64);
+  };
+
   return (
-    <screenshot-editor
-      ref={editorRef}
-      button-label="Capture"
-      button-position="bottom-right"
-      show-button={true}
-    />
+    <div>
+      <h1>My React App</h1>
+      <button onClick={handleScreenshot}>Take Screenshot</button>
+      
+      <screenshot-editor
+        ref={editorRef}
+        show-button="false"
+        onEditorOutput={handleEditorOutput}
+      />
+    </div>
   );
 }
+
+export default App;
 ```
 
----
+## 🖖 Vue Integration
 
-### Vue.js
+### Installation
 
-**Vue 3 (Composition API)**
+```bash
+npm install screenshot-editor
+```
+
+### Usage (Vue 3)
 
 ```vue
 <template>
   <div>
+    <h1>My Vue App</h1>
+    <button @click="takeScreenshot">Take Screenshot</button>
+    
     <screenshot-editor
-      ref="editorRef"
-      :button-label="'Take Screenshot'"
-      :button-position="'bottom-right'"
-      :show-button="true"
+      ref="editor"
+      :show-button="false"
+      @editor-output="handleEditorOutput"
     />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { defineCustomElements } from 'screenshot-editor/loader';
 
-const editorRef = ref(null);
+const editor = ref(null);
 
-onMounted(async () => {
-  await defineCustomElements();
-  
-  await new Promise(resolve => setTimeout(resolve, 100));
-  
-  const editor = editorRef.value;
-  if (editor) {
-    editor.addEventListener('editor-output', handleExport);
-  }
+onMounted(() => {
+  defineCustomElements();
 });
 
-onUnmounted(() => {
-  const editor = editorRef.value;
-  if (editor) {
-    editor.removeEventListener('editor-output', handleExport);
+const takeScreenshot = async () => {
+  if (editor.value) {
+    await editor.value.startScreenshot();
   }
-});
+};
 
-const handleExport = (e) => {
+const handleEditorOutput = (e) => {
   const { blob, base64 } = e.detail;
-  console.log('Exported:', blob);
+  console.log('Exported image:', blob, base64);
 };
 </script>
 ```
 
-**Vue 2 (Options API)**
+### Usage (Vue 2)
 
 ```vue
 <template>
-  <screenshot-editor
-    ref="editor"
-    :button-label="'Take Screenshot'"
-    :button-position="'bottom-right'"
-    :show-button="true"
-  />
+  <div>
+    <h1>My Vue App</h1>
+    <button @click="takeScreenshot">Take Screenshot</button>
+    
+    <screenshot-editor
+      ref="editor"
+      :show-button="false"
+      @editor-output="handleEditorOutput"
+    />
+  </div>
 </template>
 
 <script>
 import { defineCustomElements } from 'screenshot-editor/loader';
 
 export default {
-  async mounted() {
-    await defineCustomElements();
-    
-    this.$nextTick(() => {
-      const editor = this.$refs.editor;
-      if (editor) {
-        editor.addEventListener('editor-output', this.handleExport);
-      }
-    });
-  },
-  beforeDestroy() {
-    const editor = this.$refs.editor;
-    if (editor) {
-      editor.removeEventListener('editor-output', this.handleExport);
-    }
+  name: 'App',
+  mounted() {
+    defineCustomElements();
   },
   methods: {
-    handleExport(e) {
+    async takeScreenshot() {
+      if (this.$refs.editor) {
+        await this.$refs.editor.startScreenshot();
+      }
+    },
+    handleEditorOutput(e) {
       const { blob, base64 } = e.detail;
-      console.log('Exported:', blob);
+      console.log('Exported image:', blob, base64);
     }
   }
 };
 </script>
 ```
 
----
+## 🅰️ Angular Integration
 
-### Angular
+### Installation
 
-**Angular 12+ (Standalone Components)**
+```bash
+npm install screenshot-editor
+```
+
+### Usage
 
 ```typescript
-import { Component, OnInit, ViewChild, ElementRef, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+// app.component.ts
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { defineCustomElements } from 'screenshot-editor/loader';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
-  imports: [],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   template: `
-    <screenshot-editor
-      #editor
-      [button-label]="'Take Screenshot'"
-      [button-position]="'bottom-right'"
-      [show-button]="true"
-    ></screenshot-editor>
+    <div>
+      <h1>My Angular App</h1>
+      <button (click)="takeScreenshot()">Take Screenshot</button>
+      
+      <screenshot-editor
+        #editor
+        [show-button]="false"
+        (editor-output)="handleEditorOutput($event)"
+      ></screenshot-editor>
+    </div>
   `
 })
 export class AppComponent implements OnInit {
   @ViewChild('editor', { static: false }) editor!: ElementRef;
 
-  async ngOnInit() {
-    await defineCustomElements();
+  ngOnInit() {
+    defineCustomElements();
   }
 
-  ngAfterViewInit() {
-    const editorElement = this.editor?.nativeElement;
-    if (editorElement) {
-      editorElement.addEventListener('editor-output', (e: CustomEvent) => {
-        const { blob, base64 } = e.detail;
-        console.log('Exported:', blob);
-      });
+  async takeScreenshot() {
+    if (this.editor?.nativeElement) {
+      await this.editor.nativeElement.startScreenshot();
     }
+  }
+
+  handleEditorOutput(e: CustomEvent<{ blob: Blob; base64: string }>) {
+    const { blob, base64 } = e.detail;
+    console.log('Exported image:', blob, base64);
   }
 }
 ```
 
-**Angular Module-based**
+### Angular with CUSTOM_ELEMENTS_SCHEMA
 
 ```typescript
 // app.module.ts
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { defineCustomElements } from 'screenshot-editor/loader';
-
 import { AppComponent } from './app.component';
 
 defineCustomElements();
@@ -358,91 +481,28 @@ defineCustomElements();
 @NgModule({
   declarations: [AppComponent],
   imports: [BrowserModule],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  bootstrap: [AppComponent]
+  providers: [],
+  bootstrap: [AppComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AppModule { }
 ```
 
-```typescript
-// app.component.ts
-import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
-
-@Component({
-  selector: 'app-root',
-  template: `
-    <screenshot-editor
-      #editor
-      [button-label]="'Take Screenshot'"
-      [button-position]="'bottom-right'"
-      [show-button]="true"
-    ></screenshot-editor>
-  `
-})
-export class AppComponent implements AfterViewInit {
-  @ViewChild('editor', { static: false }) editor!: ElementRef;
-
-  ngAfterViewInit() {
-    const editorElement = this.editor?.nativeElement;
-    if (editorElement) {
-      editorElement.addEventListener('editor-output', (e: CustomEvent) => {
-        const { blob, base64 } = e.detail;
-        console.log('Exported:', blob);
-      });
-    }
-  }
-}
-```
-
----
-
-### Svelte
-
-```svelte
-<script>
-  import { onMount } from 'svelte';
-  import { defineCustomElements } from 'screenshot-editor/loader';
-
-  let editor;
-
-  onMount(async () => {
-    await defineCustomElements();
-    
-    editor = document.querySelector('screenshot-editor');
-    if (editor) {
-      editor.addEventListener('editor-output', (e) => {
-        const { blob, base64 } = e.detail;
-        console.log('Exported:', blob);
-      });
-    }
-  });
-</script>
-
-<screenshot-editor
-  bind:this={editor}
-  button-label="Take Screenshot"
-  button-position="bottom-right"
-  show-button={true}
-/>
-```
-
----
-
 ## 📖 API Reference
 
-### Component Properties
+### Component Props
 
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `button-label` | `string` | `"Take Screenshot"` | Button text |
-| `button-position` | `string` | `"bottom-right"` | Position: `"top-left"`, `"top-right"`, `"bottom-left"`, `"bottom-right"` |
-| `show-button` | `boolean` | `true` | Show/hide floating button |
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `buttonLabel` | `string` | `"Take Screenshot"` | Text displayed on the trigger button |
+| `buttonPosition` | `string` | `"bottom-right"` | Floating button position: `"top-left"`, `"top-right"`, `"bottom-left"`, `"bottom-right"` |
+| `showButton` | `boolean` | `true` | Whether to show the floating button |
 
 ### Methods
 
 #### `startScreenshot(): Promise<void>`
 
-Start screenshot selection.
+Starts the screenshot selection process. Opens the overlay for the user to select a region.
 
 ```javascript
 const editor = document.querySelector('screenshot-editor');
@@ -451,9 +511,10 @@ await editor.startScreenshot();
 
 #### `openEditor(image: string | Blob): Promise<void>`
 
-Open editor with existing image.
+Opens the editor with an existing image (Blob or data URL).
 
 ```javascript
+const editor = document.querySelector('screenshot-editor');
 await editor.openEditor(imageBlob);
 // or
 await editor.openEditor('data:image/png;base64,...');
@@ -463,44 +524,47 @@ await editor.openEditor('data:image/png;base64,...');
 
 #### `screenshot-selected`
 
-Fired when screenshot is captured.
+Fired when a screenshot is captured (before opening the editor).
 
 ```javascript
 editor.addEventListener('screenshot-selected', (e) => {
-  const blob = e.detail;
-  console.log('Screenshot:', blob);
+  const blob = e.detail; // Blob object
+  console.log('Screenshot captured:', blob);
 });
 ```
 
 #### `editor-opened`
 
-Fired when editor opens.
+Fired when the editor is opened.
 
 ```javascript
 editor.addEventListener('editor-opened', () => {
-  console.log('Editor opened');
+  console.log('Editor is now open');
 });
 ```
 
 #### `editor-output`
 
-Fired when image is exported.
+Fired when the user exports the edited image (via "Save and Exit" button).
 
 ```javascript
 editor.addEventListener('editor-output', (e) => {
   const { blob, base64 } = e.detail;
-  console.log('Exported:', blob, base64);
+  console.log('Exported image:', blob, base64);
   
-  // Example: Upload to server
-  const formData = new FormData();
-  formData.append('image', blob, 'screenshot.png');
-  fetch('/api/upload', { method: 'POST', body: formData });
+  // Example: Download the image
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'screenshot.png';
+  a.click();
+  URL.revokeObjectURL(url);
 });
 ```
 
 #### `editor-closed`
 
-Fired when editor closes.
+Fired when the editor is closed.
 
 ```javascript
 editor.addEventListener('editor-closed', () => {
@@ -508,31 +572,64 @@ editor.addEventListener('editor-closed', () => {
 });
 ```
 
----
-
 ## 🎨 Editor Tools
 
-- **Freehand** - Draw freehand lines
-- **Rectangle** - Draw rectangles
-- **Ellipse** - Draw ellipses
-- **Arrow** - Draw arrows
-- **Line** - Draw straight lines
-- **Text** - Add text annotations (with font size control)
-- **Crop** - Crop the image
+### Drawing Tools
+
+1. **Freehand** - Draw freehand lines
+2. **Rectangle** - Draw rectangles
+3. **Ellipse** - Draw ellipses
+4. **Arrow** - Draw arrows
+5. **Line** - Draw straight lines
+6. **Text** - Add text annotations (with font size control)
+7. **Crop** - Crop the image
 
 ### Controls
 
-- **Color Picker** - Select drawing color
-- **Brush Size** - Adjust thickness (1-20px)
-- **Font Size** - For text tool (8-72px)
-- **Undo/Redo** - Navigate edit history
-- **Save and Exit** - Export the edited image
+- **Color Picker**: Select drawing color
+- **Brush Size**: Adjust line/brush thickness (1-20px)
+- **Font Size**: Control text size (8-72px) - visible when text tool is selected
+- **Undo/Redo**: Navigate through edit history
+- **Save and Exit**: Export the final edited image
 
----
+## 📝 Complete Usage Examples
 
-## 💡 Common Use Cases
+### Example 1: Basic Integration with Button
 
-### Upload to Server
+```html
+<screenshot-editor
+  button-label="Capture Screen"
+  button-position="top-right"
+></screenshot-editor>
+```
+
+### Example 2: Function-Based Triggering
+
+```javascript
+import { defineCustomElements } from 'screenshot-editor/loader';
+
+defineCustomElements().then(() => {
+  const editor = document.querySelector('screenshot-editor');
+  editor.showButton = false; // Hide default button
+  
+  // Your custom trigger function
+  function triggerScreenshot() {
+    editor.startScreenshot();
+  }
+  
+  // Attach to any element
+  document.getElementById('myButton').addEventListener('click', triggerScreenshot);
+  
+  // Handle output
+  editor.addEventListener('editor-output', (e) => {
+    const { blob, base64 } = e.detail;
+    // Use the image
+    console.log('Image ready:', base64);
+  });
+});
+```
+
+### Example 3: Upload to Server
 
 ```javascript
 editor.addEventListener('editor-output', async (e) => {
@@ -541,45 +638,111 @@ editor.addEventListener('editor-output', async (e) => {
   const formData = new FormData();
   formData.append('image', blob, 'screenshot.png');
   
-  const response = await fetch('/api/upload', {
-    method: 'POST',
-    body: formData
-  });
-  
-  const result = await response.json();
-  console.log('Uploaded:', result);
-});
-```
-
-### Download Image
-
-```javascript
-editor.addEventListener('editor-output', (e) => {
-  const { blob } = e.detail;
-  
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `screenshot-${Date.now()}.png`;
-  a.click();
-  URL.revokeObjectURL(url);
-});
-```
-
-### Open Existing Image
-
-```javascript
-// From file input
-const fileInput = document.querySelector('input[type="file"]');
-fileInput.addEventListener('change', async (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    await editor.openEditor(file);
+  try {
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData
+    });
+    const result = await response.json();
+    console.log('Uploaded:', result);
+  } catch (error) {
+    console.error('Upload failed:', error);
   }
 });
 ```
 
----
+### Example 4: Open Editor with File Input
+
+```html
+<input type="file" id="fileInput" accept="image/*">
+<screenshot-editor show-button="false"></screenshot-editor>
+
+<script type="module">
+  import { defineCustomElements } from 'screenshot-editor/loader';
+  defineCustomElements().then(() => {
+    const editor = document.querySelector('screenshot-editor');
+    const fileInput = document.getElementById('fileInput');
+    
+    fileInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        await editor.openEditor(file);
+      }
+    });
+  });
+</script>
+```
+
+### Example 5: React Hook
+
+```jsx
+import { useEffect, useRef } from 'react';
+import { defineCustomElements } from 'screenshot-editor/loader';
+
+function useScreenshotEditor() {
+  const editorRef = useRef(null);
+
+  useEffect(() => {
+    defineCustomElements();
+  }, []);
+
+  const takeScreenshot = async () => {
+    if (editorRef.current) {
+      await editorRef.current.startScreenshot();
+    }
+  };
+
+  const openEditor = async (image) => {
+    if (editorRef.current) {
+      await editorRef.current.openEditor(image);
+    }
+  };
+
+  return { editorRef, takeScreenshot, openEditor };
+}
+
+// Usage
+function MyComponent() {
+  const { editorRef, takeScreenshot } = useScreenshotEditor();
+
+  return (
+    <div>
+      <button onClick={takeScreenshot}>Screenshot</button>
+      <screenshot-editor ref={editorRef} show-button="false" />
+    </div>
+  );
+}
+```
+
+## 🛠️ Development
+
+### Build
+
+```bash
+npm run build
+```
+
+### Development Server
+
+```bash
+npm start
+```
+
+This will start a development server with hot-reload at `http://localhost:3333`.
+
+### Project Structure
+
+```
+src/
+  components/
+    screenshot-editor/     # Main component
+    image-editor/          # Image editor component
+  utils/
+    screen-selector.ts     # DOM selection overlay
+    html2canvas.ts         # Screenshot capture utility
+    drawing-tools/         # Drawing tool implementations
+    undo-redo.ts           # Undo/redo manager
+```
 
 ## 🔧 Browser Support
 
@@ -588,13 +751,48 @@ fileInput.addEventListener('change', async (e) => {
 - Safari (latest)
 - Mobile browsers (iOS Safari, Chrome Mobile)
 
----
+## 📦 Output Targets
+
+The package supports multiple output formats:
+
+- **ESM**: `dist/index.js`
+- **CJS**: `dist/index.cjs.js`
+- **Custom Elements**: `dist-custom-elements/`
+- **Loader**: `loader/index.js`
+
+## 🎯 Key Features
+
+- ✅ Works inside Shadow DOM
+- ✅ Full-page screenshot support (outside shadow root)
+- ✅ Touch-friendly interface
+- ✅ Responsive design
+- ✅ Lightweight (no heavy dependencies like fabric.js)
+- ✅ Modular architecture
+- ✅ TypeScript support
+- ✅ Fully typed API
+- ✅ Framework agnostic (works with React, Vue, Angular, or vanilla JS)
+
+## 🐛 Troubleshooting
+
+### Screenshot not capturing correctly
+
+Make sure the page content is fully loaded before triggering the screenshot. The component uses `html2canvas` which requires the DOM to be ready.
+
+### Editor not opening
+
+Check the browser console for errors. Ensure the component is properly loaded and the image data is valid.
+
+### Touch events not working
+
+Ensure `touch-action: none` is not being overridden by parent styles. The component handles this internally.
+
+### Component not rendering in React/Vue/Angular
+
+Make sure you've called `defineCustomElements()` before using the component. In React, call it in `useEffect`. In Vue, call it in `mounted()`. In Angular, call it in `ngOnInit()` or in the module.
 
 ## 📄 License
 
 MIT
-
----
 
 ## 🤝 Contributing
 
@@ -602,7 +800,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📧 Support
 
-For issues and feature requests, please use the [GitHub issue tracker](https://github.com/eccentricengine/screenshot-editor/issues).
+For issues and feature requests, please use the GitHub issue tracker.
 
 ---
 

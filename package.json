@@ -12,13 +12,11 @@
       "require": "./dist/index.cjs.js",
       "types": "./dist/types/index.d.ts"
     },
-    "./loader": "./loader/index.js",
-    "./standalone": "./screenshot-editor.standalone.js"
+    "./loader": "./loader/index.js"
   },
   "files": [
     "dist/",
     "loader/",
-    "screenshot-editor.standalone.js",
     "README.md"
   ],
   "scripts": {
